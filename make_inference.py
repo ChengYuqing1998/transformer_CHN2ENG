@@ -1,20 +1,6 @@
-import nltk
-import numpy as np
-from torch.utils.data import DataLoader
-import torch
-from transformer import *
 from translator import *
-from tqdm import tqdm
 import pickle
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = torch.load('./models/c2e_transformer_[0526-test1].pt', map_location=device)
-
-
-PAD_token = 0
-BOS_token = 1
-EOS_token = 2
-UNK_token = 3
+import argparse
 
 
 def indexes_from_sentence(lang, sentence):
@@ -43,34 +29,54 @@ def variable_from_sentence(lang, sentence, device):
     return var
 
 
-with open('./input_lang.pkl', 'rb') as f:
-    input_lang = pickle.load(f)
-with open('./output_lang.pkl', 'rb') as f:
-    output_lang = pickle.load(f)
+def main():
+    params = argparse.ArgumentParser("Augment data based on a specified method")
+    params.add_argument('--model_path', type=str, default='./models/c2e_transformer_[0526-test1].pt',
+                        help='Specifying the path where to look up for model.')
+    params.add_argument('--input_lang_path', type=str, default='./input_lang.pkl',
+                        help='Specifying the path where to look up for input lang.')
+    params.add_argument('--output_lang_path', type=str, default='./output_lang.pkl',
+                        help='Specifying the path where to look up for output lang.')
+    params.add_argument('--device', type=str, default='auto', help='choose cpu cuda or auto')
 
-
-count = 1
-limit = 10  # it allows you try 10 sentences till it'll be closed
-translator = Translator(model, 5, model.max_len, BOS_token, EOS_token, device=torch.device('cuda'))
-while True:
-    if count <= limit:
-        sentence = input("please enter Chinese sentence: ").strip()
-        enc_inputs = variable_from_sentence(input_lang, sentence, device).view(1, -1)
-        enc_input_list = list(*enc_inputs.cpu().numpy())
-        enc_input_list.pop(-1)
-        enc_input_list.append(EOS_token)
-        enc_inputs = [BOS_token]
-        enc_inputs.extend(enc_input_list)
-        enc_inputs= torch.tensor(enc_inputs, dtype=torch.long, device=device).reshape(1, -1)
-        pred_seqs = translator.translate(enc_inputs)
-        output_sentence = [' '.join([output_lang.index2word[_] for _ in pred_seq ]) for pred_seq in pred_seqs]
-        print(output_sentence[0])
-        count += 1
+    args = params.parse_args()
+    assert args.device in ['cpu', 'cuda', 'auto']
+    if args.device == 'auto':
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     else:
-        break
+        device = torch.device(args.device)
+    model = torch.load(args.model_path, map_location=device)
+
+    with open(args.input_lang_path, 'rb') as f:
+        input_lang = pickle.load(f)
+    with open(args.output_lang_path, 'rb') as f:
+        output_lang = pickle.load(f)
+
+    count = 1
+    limit = 10  # it allows you try 10 sentences till it'll be closed
+
+    translator = Translator(model, 5, model.max_len, model.trg_bos_idx, model.trg_eos_idx, device=device)
+    while True:
+        if count <= limit:
+            description = "please enter Chinese sentence (" + str(limit-count+1) + " left) : "
+            sentence = input(description).strip()
+            enc_inputs = variable_from_sentence(input_lang, sentence, device).view(1, -1)
+            enc_input_list = list(*enc_inputs.cpu().numpy())
+            enc_input_list.pop(-1)
+            enc_input_list.append(EOS_token)
+            enc_inputs = [BOS_token]
+            enc_inputs.extend(enc_input_list)
+            enc_inputs = torch.tensor(enc_inputs, dtype=torch.long, device=device).reshape(1, -1)
+            pred_seqs = translator.translate(enc_inputs)
+            output_sentence = [' '.join([output_lang.index2word[_] for _ in pred_seq]) for pred_seq in pred_seqs]
+            print(output_sentence[0])
+            count += 1
+        else:
+            break
 
 
-
+if __name__ == '__main__':
+    main()
 
 
 

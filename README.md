@@ -27,7 +27,15 @@ tail -f console.log
 
 ### 推理
 ```
-# 可在文件中修改用以推理的模型的名称和路径
-python make_inference.py
+# 可在命令参数中指定用以推理的模型的名称和路径
+python make_inference.py [--model_path MODEL_PATH]
+                         [--input_lang_path INPUT_LANG_PATH]
+                         [--output_lang_path OUTPUT_LANG_PATH]
+                         [--device DEVICE] 
+                         
+# 如果只需默认参数 可以忽略后面的命令参数 直接运行 python make_inference.py
+# input_lang.pkl 文件可用于将输入的源文本token和数值token的互相转换
+# output_lang.pkl 文件可用于将输出的目标文本token和数值token的互相转换
+# device 默认值为auto 自动根据系统情况选择cuda还是cpu推理 另外支持指定 'cpu' 或 'cuda
 ```
 执行上述命令后，你可在控制台输入你想尝试翻译的中文句子，按回车键可等待10s左右查看翻译结果，单次运行允许10条翻译。可以重复运行。
