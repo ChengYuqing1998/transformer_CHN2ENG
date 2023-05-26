@@ -3,7 +3,7 @@
 ## 数据文件
 cn-eng.txt中包含90000条中英文句对。
 ## 安装环境
-假设你的系统(适用于Linux和MacOS)已经安装好Anaconda \
+假设你的系统(适用于Linux和MacOS)已经安装好Anaconda：
 ```
 # 首先在终端中进入当前目录
 
