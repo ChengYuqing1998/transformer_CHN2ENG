@@ -1,12 +1,12 @@
 # transformer_CHN2ENG
-使用transformer模型实现机器翻译任务，针对中译英的翻译任务
-Using Transformer model to do machine translation task focusing on Chinese to English
+使用transformer模型实现机器翻译任务，针对中译英的翻译任务  
+Using Transformer model to do machine translation task focusing on translation from Chinese to English
 ## 数据文件 (Data)
-cn-eng.txt中包含90000条中英文句对。
+cn-eng.txt中包含90000条中英文句对  
 cn-eng.txt includes 90,000 Chinese-English sentence pairs
 ## 安装环境 (Environment set-up)
-假设你的系统(适用于Linux和MacOS)已经安装好Anaconda：
-Assuming your system (applicable to Linux & MacOS) has been installed with Anaconda
+假设你的系统(适用于Linux和MacOS)已经安装好Anaconda：  
+Assuming your system (applicable to Linux & MacOS) has been installed with Anaconda：
 ```
 # 首先在终端中进入当前目录
 # enter current dir in the terminal
@@ -36,7 +36,7 @@ tail -f console.log
 
 The model with the optimal loss during training is saved in models/intermediate in pt format, and the final model is saved in the directory models. You can try to train the model under different parameters by modifying the c2e_configs.yaml file.
 
-### 推理
+### 推理 (Inference)
 ```
 # 可在命令参数中指定用以推理的模型的名称和路径
 # The name and path of the model used for inference can be specified in the command parameters.
